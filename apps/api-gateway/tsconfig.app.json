@@ -8,5 +8,5 @@
     "emitDecoratorMetadata": true,
     "target": "es2021"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "../../libs/common/src/constants.ts"]
 }

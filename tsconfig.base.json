@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@sample/common": ["libs/common/src/index.ts"],
       "@sample/config": ["libs/config/src/index.ts"]
     }
   },

@@ -42,3 +42,16 @@ Thumbs.db
 .nx/workspace-data
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+
+# Environment Files
+.env
+*.env.local
+.env.compose.*
+apps/*/.env
+apps/*/.env.local
+apps/*/.env.compose.*
+# except the example env files
+!apps/*/.env.example
+!apps/*/.env.compose.example
+!.env.example
+!.env.compose.example

@@ -1,6 +1,6 @@
 import { Controller, Get, Inject } from '@nestjs/common';
-import { MICROSERVICES_CLIENTS } from '../../constant';
 import { ClientProxy } from '@nestjs/microservices';
+import { MICROSERVICES_CLIENTS, SkipEnvelope } from '@sample/common';
 
 @Controller('users')
 export class UserController {
@@ -10,6 +10,7 @@ export class UserController {
   ) {}
 
   @Get('me')
+  // @SkipEnvelope()
   getMe() {
     return this.usersServiceClient.send('user.get_profile', { userId: 1 });
   }

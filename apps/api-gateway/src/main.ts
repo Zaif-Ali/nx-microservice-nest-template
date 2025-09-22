@@ -1,18 +1,43 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
-import { Logger } from '@nestjs/common';
+import {
+  HttpStatus,
+  Logger,
+  UnprocessableEntityException,
+  ValidationPipe,
+} from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
 import { Env } from '@sample/config';
+import helmet from 'helmet';
+import compression from 'compression';
+import { AllExceptionsFilter } from '@sample/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(helmet());
+  app.use(compression());
+  app.useGlobalFilters(new AllExceptionsFilter());
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+
+  app.enableCors({
+    origin: true, // reflect request origin
+    credentials: true,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['x-request-id'],
+  });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      transform: true,
+      exceptionFactory: (errors) => new UnprocessableEntityException(errors),
+      forbidNonWhitelisted: true,
+    })
+  );
 
   const cfg = app.get<ConfigService<Env, true>>(ConfigService);
 
