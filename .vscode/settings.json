@@ -2,6 +2,8 @@
     "nxConsole.generateAiAgentRules": true,
     "cSpell.words": [
         "appendonly",
-        "requirepass"
+        "pino",
+        "requirepass",
+        "xpack"
     ]
 }

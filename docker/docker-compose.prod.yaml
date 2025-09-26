@@ -1,0 +1,59 @@
+
+volumes:
+  redis-throttler-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
+
+
+services:
+  redis-throttler:
+    image: redis:7-alpine
+    container_name: redis-throttler
+    command: ['redis-server','--appendonly','no','--requirepass','${REDIS_THROTTLER_PASSWORD}']
+    # ports:
+    #   - '${REDIS_THROTTLER_PORT}:6379'
+    environment:
+      - REDIS_THROTTLER_PASSWORD=${REDIS_THROTTLER_PASSWORD}
+    volumes:
+      - redis-throttler-data:/data
+    networks: [app-network]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli -a "$${REDIS_THROTTLER_PASSWORD}" PING | grep PONG']
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: apps/api-gateway/Dockerfile
+    ports:
+      - '${API_GATEWAY_PORT:-4000}:4000'
+    env_file:
+      - ../apps/api-gateway/.env.production
+    environment:
+      REDIS_THROTTLER_PASSWORD: ${REDIS_THROTTLER_PASSWORD}
+    depends_on:
+      - redis-throttler
+      - users-service
+    networks: [app-network]
+    restart: unless-stopped
+    logging:
+      driver: json-file
+
+  users-service:
+    build:
+      context: ..
+      dockerfile: apps/users-service/Dockerfile
+    env_file:
+      - ../apps/users-service/.env.production
+    depends_on:
+      - redis-throttler
+    networks: [app-network]
+    restart: unless-stopped
+    logging:
+      driver: json-file

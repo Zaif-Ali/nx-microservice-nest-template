@@ -12,10 +12,10 @@ export const EnvSchema = z.object({
   RATE_LIMIT_LIMIT: z.coerce.number().default(100),
   TRUST_PROXY: z.coerce.boolean().default(false),
   // Redis setup for the throttler 
-  REDIS_HOST: z.string().default('127.0.0.1'),
-  REDIS_PORT: z.coerce.number().default(6379),
-  REDIS_PASSWORD: z.string().optional(),
-  REDIS_DB: z.coerce.number().default(0),
+  REDIS_THROTTLER_HOST: z.string().default('127.0.0.1'),
+  REDIS_THROTTLER_PORT: z.coerce.number().default(6379),
+  REDIS_THROTTLER_PASSWORD: z.string().optional(),
+  REDIS_THROTTLER_DB: z.coerce.number().default(0),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

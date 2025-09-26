@@ -1,6 +1,5 @@
 import {
   HttpStatus,
-  Logger,
   UnprocessableEntityException,
   ValidationPipe,
 } from '@nestjs/common';
@@ -10,13 +9,16 @@ import { ConfigService } from '@nestjs/config';
 import { Env } from '@sample/config';
 import helmet from 'helmet';
 import compression from 'compression';
-import { AllExceptionsFilter } from '@sample/common';
+import { AllExceptionsFilter, requestIdMiddleware } from '@sample/common';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
   app.use(compression());
+  app.use(requestIdMiddleware);
+  app.useLogger(app.get(Logger));
   app.useGlobalFilters(new AllExceptionsFilter());
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
@@ -50,8 +52,8 @@ async function bootstrap() {
   const port = cfg.get('PORT', { infer: true }) || 3000;
 
   await app.listen(port);
-  Logger.log(
-    `🚀 API Gateway is running on: http://${process.env.HOST}:${process.env.PORT}`
+  app.get(Logger).log(
+    `🚀 API Gateway is running on: http://${cfg.get('HOST', { infer: true })}:${cfg.get('PORT', { infer: true })}`
   );
 }
 
